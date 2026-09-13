@@ -102,7 +102,7 @@ export function ImageReveal({
       transition={{
         duration: 1.15,
         delay,
-        ease: [0.76, 0, 0.24, 1],
+        ease: [0.76, 0, 0.24, 1] as const,
       }}
       {...props}
     >
@@ -125,7 +125,7 @@ export function ImageReveal({
           scale: {
             duration: 1.35,
             delay,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           },
         }}
       >

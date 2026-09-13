@@ -100,7 +100,7 @@ export function Button({
           variants={backgroundVariants}
           transition={{
             duration: 0.65,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className={`absolute inset-0 origin-center rounded-full ${classes.hoverBackground}`}
         />
@@ -124,7 +124,7 @@ export function Button({
             }}
             transition={{
               duration: 0.45,
-              ease: [0.22, 1, 0.36, 1],
+              ease: [0.22, 1, 0.36, 1] as const,
             }}
           >
             {children}
@@ -136,7 +136,7 @@ export function Button({
             variants={arrowVariants}
             transition={{
               duration: 0.45,
-              ease: [0.22, 1, 0.36, 1],
+              ease: [0.22, 1, 0.36, 1] as const,
             }}
             className="flex items-center"
           >
@@ -184,7 +184,7 @@ export function Button({
         variants={containerVariants}
         transition={{
           duration: 0.45,
-          ease: [0.22, 1, 0.36, 1],
+          ease: [0.22, 1, 0.36, 1] as const,
         }}
         className="inline-flex"
       >
@@ -208,7 +208,7 @@ export function Button({
       variants={containerVariants}
       transition={{
         duration: 0.45,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       }}
       className={sharedClassName}
       {...props}

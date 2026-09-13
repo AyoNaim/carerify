@@ -92,7 +92,7 @@ export function TextReveal({
         duration: 0.9,
         delayChildren: delay,
         staggerChildren: stagger,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };

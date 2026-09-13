@@ -46,7 +46,7 @@ export function Logo({
           }}
           transition={{
             duration: 0.6,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="absolute inset-0 rounded-[13px] border"
           style={{
@@ -68,7 +68,7 @@ export function Logo({
           }}
           transition={{
             duration: 0.55,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="absolute h-6 w-6 rounded-[9px]"
           style={{
@@ -88,7 +88,7 @@ export function Logo({
           }}
           transition={{
             duration: 0.45,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           width="14"
           height="14"
@@ -120,7 +120,7 @@ export function Logo({
             }}
             transition={{
               duration: 0.45,
-              ease: [0.22, 1, 0.36, 1],
+              ease: [0.22, 1, 0.36, 1] as const,
             }}
           />
         </motion.svg>

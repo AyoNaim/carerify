@@ -201,7 +201,7 @@ function MenuButton({
           }
           transition={{
             duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="absolute left-0 h-px w-full origin-center"
           style={{ backgroundColor: foreground }}
@@ -222,7 +222,7 @@ function MenuButton({
           }
           transition={{
             duration: 0.5,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="absolute left-0 h-px w-full origin-center"
           style={{ backgroundColor: foreground }}
@@ -314,7 +314,7 @@ function MobileMenu({
           transition={{
             duration: reducedMotion ? 0.01 : 1.2,
             delay: reducedMotion ? 0 : 0.15,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="
             absolute
@@ -344,7 +344,7 @@ function MobileMenu({
           transition={{
             duration: reducedMotion ? 0.01 : 1.4,
             delay: reducedMotion ? 0 : 0.2,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="
             absolute
@@ -537,7 +537,7 @@ function MobileNavLink({
       transition={{
         duration: reducedMotion ? 0.01 : 0.8,
         delay: reducedMotion ? 0 : 0.22 + index * 0.07,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       }}
     >
       <Link
@@ -605,7 +605,7 @@ function MobileNavLink({
           }}
           transition={{
             duration: 0.45,
-            ease: [0.22, 1, 0.36, 1],
+            ease: [0.22, 1, 0.36, 1] as const,
           }}
           className="ml-4 shrink-0 text-[var(--sage)]"
         >

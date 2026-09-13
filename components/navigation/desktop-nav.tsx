@@ -69,7 +69,7 @@ export function DesktopNav({
         transition={{
           duration: 0.6,
           delay: 0.25,
-          ease: [0.22, 1, 0.36, 1],
+          ease: [0.22, 1, 0.36, 1] as const,
         }}
         className="h-7 w-px origin-center"
         style={{
@@ -138,7 +138,7 @@ function NavLink({
       transition={{
         duration: 0.7,
         delay: 0.15 + index * 0.055,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       }}
     >
       <Link
