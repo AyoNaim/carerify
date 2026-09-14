@@ -84,7 +84,7 @@ export async function POST(request: Request) {
       phone: formData.get("phone"),
       location: formData.get("location"),
       professionalRole: formData.get("professionalRole"),
-      experience_level: formData.get("yearsExperience"),
+      yearsExperience: formData.get("yearsExperience"),
       experienceSummary: formData.get("experienceSummary"),
       preferredArea: formData.get("preferredArea"),
       consent: formData.get("consent"),
