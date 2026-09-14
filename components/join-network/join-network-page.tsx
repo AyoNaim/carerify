@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useActionState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
+import {
+  submitJoinNetwork,
+  type JoinNetworkState,
+} from "@/app/actions/join-network";
 import { Arrow } from "@/components/ui/arrow";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -11,18 +15,33 @@ import { ImageReveal } from "@/components/motion/image-reveal";
 import { TextReveal } from "@/components/motion/text-reveal";
 
 const roles = [
-  "Personal Support Worker (PSW)",
-  "Registered Practical Nurse (RPN)",
-  "Registered Nurse (RN)",
-  "Dietary & Support Staff",
-  "Other",
+  {
+    value: "PSW",
+    label: "Personal Support Worker (PSW)",
+  },
+  {
+    value: "RPN",
+    label: "Registered Practical Nurse (RPN)",
+  },
+  {
+    value: "RN",
+    label: "Registered Nurse (RN)",
+  },
+  {
+    value: "Dietary & Support Staff",
+    label: "Dietary & Support Staff",
+  },
+  {
+    value: "Other",
+    label: "Other",
+  },
 ];
 
 const experienceLevels = [
   "Less than 1 year",
-  "1–3 years",
+  "1–2 years",
   "3–5 years",
-  "5–10 years",
+  "6–10 years",
   "10+ years",
 ];
 
@@ -58,14 +77,32 @@ function SectionNumber({ number }: { number: string }) {
   );
 }
 
+function FieldError({ errors }: { errors?: string[] }) {
+  if (!errors?.length) {
+    return null;
+  }
+
+  return (
+    <p className="mt-2 text-xs leading-5 text-red-700" role="alert">
+      {errors[0]}
+    </p>
+  );
+}
+
+const initialState: JoinNetworkState = {
+  success: false,
+  message: "",
+};
+
 export function JoinNetworkPage() {
   const shouldReduceMotion = useReducedMotion();
-  const [submitted, setSubmitted] = useState(false);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-  }
+  const [state, formAction, isPending] = useActionState(
+    submitJoinNetwork,
+    initialState,
+  );
+
+  const errors = state.errors ?? {};
 
   const fadeUp = {
     initial: shouldReduceMotion
@@ -208,7 +245,7 @@ export function JoinNetworkPage() {
       <section id="application" className="scroll-mt-24 bg-[#E8F0EA]">
         <div className="mx-auto max-w-[1440px] px-6 py-20 sm:px-10 lg:px-16 lg:py-28">
           <AnimatePresence mode="wait">
-            {!submitted ? (
+            {!state.success ? (
               <motion.div
                 key="form"
                 initial={shouldReduceMotion ? false : { opacity: 0 }}
@@ -226,23 +263,34 @@ export function JoinNetworkPage() {
                     </h2>
 
                     <p className="mt-6 max-w-[390px] text-sm leading-6 text-[#172033]/60">
-                      A few details are enough to start. You can tell us more
-                      about your experience as you move through the form.
+                      A few details are enough to start. Tell us about your
+                      professional experience and where you would like to
+                      contribute.
                     </p>
 
                     <div className="mt-10 border-l border-[#1B2D5B]/30 pl-5">
                       <p className="text-sm leading-6 text-[#172033]/65">
-                        Fields marked with <span className="text-[#1B2D5B]">*</span>{" "}
-                        are required.
+                        Fields marked with{" "}
+                        <span className="text-[#1B2D5B]">*</span> are required.
                       </p>
                     </div>
                   </div>
 
                   {/* Form */}
                   <form
-                    onSubmit={handleSubmit}
+                    action={formAction}
                     className="bg-[#F5EFE6] px-6 py-8 sm:px-10 sm:py-12 lg:px-14 lg:py-16"
                   >
+                    {/* General submission error */}
+                    {!state.success && state.message && !state.errors && (
+                      <div
+                        role="alert"
+                        className="mb-10 border border-red-700/20 bg-red-50 px-5 py-4 text-sm leading-6 text-red-800"
+                      >
+                        {state.message}
+                      </div>
+                    )}
+
                     {/* About you */}
                     <div>
                       <div className="flex items-start gap-5">
@@ -262,6 +310,7 @@ export function JoinNetworkPage() {
                       <div className="mt-10 grid gap-7 sm:grid-cols-2">
                         <div>
                           <FieldLabel required>First name</FieldLabel>
+
                           <input
                             required
                             name="firstName"
@@ -269,11 +318,20 @@ export function JoinNetworkPage() {
                             autoComplete="given-name"
                             placeholder="Your first name"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.firstName)}
+                            aria-describedby={
+                              errors.firstName ? "firstName-error" : undefined
+                            }
                           />
+
+                          <div id="firstName-error">
+                            <FieldError errors={errors.firstName} />
+                          </div>
                         </div>
 
                         <div>
                           <FieldLabel required>Last name</FieldLabel>
+
                           <input
                             required
                             name="lastName"
@@ -281,11 +339,20 @@ export function JoinNetworkPage() {
                             autoComplete="family-name"
                             placeholder="Your last name"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.lastName)}
+                            aria-describedby={
+                              errors.lastName ? "lastName-error" : undefined
+                            }
                           />
+
+                          <div id="lastName-error">
+                            <FieldError errors={errors.lastName} />
+                          </div>
                         </div>
 
                         <div>
                           <FieldLabel required>Email</FieldLabel>
+
                           <input
                             required
                             name="email"
@@ -293,11 +360,20 @@ export function JoinNetworkPage() {
                             autoComplete="email"
                             placeholder="you@example.com"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.email)}
+                            aria-describedby={
+                              errors.email ? "email-error" : undefined
+                            }
                           />
+
+                          <div id="email-error">
+                            <FieldError errors={errors.email} />
+                          </div>
                         </div>
 
                         <div>
                           <FieldLabel required>Phone</FieldLabel>
+
                           <input
                             required
                             name="phone"
@@ -305,18 +381,36 @@ export function JoinNetworkPage() {
                             autoComplete="tel"
                             placeholder="Your phone number"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.phone)}
+                            aria-describedby={
+                              errors.phone ? "phone-error" : undefined
+                            }
                           />
+
+                          <div id="phone-error">
+                            <FieldError errors={errors.phone} />
+                          </div>
                         </div>
 
                         <div className="sm:col-span-2">
-                          <FieldLabel>City / area</FieldLabel>
+                          <FieldLabel required>City / area</FieldLabel>
+
                           <input
+                            required
                             name="location"
                             type="text"
                             autoComplete="address-level2"
                             placeholder="Where are you based?"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.location)}
+                            aria-describedby={
+                              errors.location ? "location-error" : undefined
+                            }
                           />
+
+                          <div id="location-error">
+                            <FieldError errors={errors.location} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -345,20 +439,30 @@ export function JoinNetworkPage() {
 
                           <select
                             required
-                            name="role"
+                            name="professionalRole"
                             defaultValue=""
                             className={selectClassName}
+                            aria-invalid={Boolean(errors.professionalRole)}
+                            aria-describedby={
+                              errors.professionalRole
+                                ? "professionalRole-error"
+                                : undefined
+                            }
                           >
                             <option value="" disabled>
                               Select your role
                             </option>
 
                             {roles.map((role) => (
-                              <option key={role} value={role}>
-                                {role}
+                              <option key={role.value} value={role.value}>
+                                {role.label}
                               </option>
                             ))}
                           </select>
+
+                          <div id="professionalRole-error">
+                            <FieldError errors={errors.professionalRole} />
+                          </div>
                         </div>
 
                         <div>
@@ -366,9 +470,15 @@ export function JoinNetworkPage() {
 
                           <select
                             required
-                            name="experience"
+                            name="yearsExperience"
                             defaultValue=""
                             className={selectClassName}
+                            aria-invalid={Boolean(errors.yearsExperience)}
+                            aria-describedby={
+                              errors.yearsExperience
+                                ? "yearsExperience-error"
+                                : undefined
+                            }
                           >
                             <option value="" disabled>
                               Years of experience
@@ -380,27 +490,57 @@ export function JoinNetworkPage() {
                               </option>
                             ))}
                           </select>
+
+                          <div id="yearsExperience-error">
+                            <FieldError errors={errors.yearsExperience} />
+                          </div>
                         </div>
 
                         <div className="sm:col-span-2">
-                          <FieldLabel>Professional experience</FieldLabel>
+                          <FieldLabel required>
+                            Professional experience
+                          </FieldLabel>
 
                           <textarea
-                            name="professionalExperience"
+                            required
+                            name="experienceSummary"
                             placeholder="Tell us briefly about your experience, the environments you have worked in, or the kind of care you are experienced in providing."
                             className={textareaClassName}
+                            aria-invalid={Boolean(errors.experienceSummary)}
+                            aria-describedby={
+                              errors.experienceSummary
+                                ? "experienceSummary-error"
+                                : undefined
+                            }
                           />
+
+                          <div id="experienceSummary-error">
+                            <FieldError errors={errors.experienceSummary} />
+                          </div>
                         </div>
 
                         <div className="sm:col-span-2">
-                          <FieldLabel>Preferred area of work</FieldLabel>
+                          <FieldLabel required>
+                            Preferred area of work
+                          </FieldLabel>
 
                           <input
+                            required
                             name="preferredArea"
                             type="text"
                             placeholder="Where would you ideally like to contribute?"
                             className={inputClassName}
+                            aria-invalid={Boolean(errors.preferredArea)}
+                            aria-describedby={
+                              errors.preferredArea
+                                ? "preferredArea-error"
+                                : undefined
+                            }
                           />
+
+                          <div id="preferredArea-error">
+                            <FieldError errors={errors.preferredArea} />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -414,89 +554,46 @@ export function JoinNetworkPage() {
 
                         <div>
                           <h3 className="text-2xl font-medium tracking-[-0.03em] text-[#172033]">
-                            Supporting documents
+                            Supporting document
                           </h3>
 
                           <p className="mt-2 text-sm leading-6 text-[#172033]/55">
-                            Share anything that helps us understand your
-                            professional background.
+                            Give us another way to understand your professional
+                            background.
                           </p>
                         </div>
                       </div>
 
-                      <div className="mt-10 space-y-6">
+                      <div className="mt-10">
                         <label className="block cursor-pointer border border-dashed border-[#172033]/20 bg-white/40 p-6 transition-colors hover:border-[#1B2D5B]/50">
                           <span className="block text-sm font-medium text-[#172033]">
                             Resume or CV
                           </span>
 
                           <span className="mt-1 block text-xs leading-5 text-[#172033]/50">
-                            Optional. PDF, DOC, or DOCX.
+                            Optional. PDF, DOC, or DOCX. Maximum 5 MB.
                           </span>
 
                           <input
-                            name="resume"
+                            name="document"
                             type="file"
-                            accept=".pdf,.doc,.docx"
+                            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                             className="mt-5 block w-full text-sm text-[#172033]/60 file:mr-4 file:border-0 file:bg-[#1B2D5B] file:px-4 file:py-2.5 file:text-xs file:font-semibold file:text-white hover:file:bg-[#172033]"
+                            aria-invalid={Boolean(errors.document)}
+                            aria-describedby={
+                              errors.document ? "document-error" : undefined
+                            }
                           />
                         </label>
 
-                        <label className="block cursor-pointer border border-dashed border-[#172033]/20 bg-white/40 p-6 transition-colors hover:border-[#1B2D5B]/50">
-                          <span className="block text-sm font-medium text-[#172033]">
-                            Professional documents
-                          </span>
-
-                          <span className="mt-1 block text-xs leading-5 text-[#172033]/50">
-                            Optional. Add relevant certificates or supporting
-                            documents if appropriate.
-                          </span>
-
-                          <input
-                            name="professionalDocuments"
-                            type="file"
-                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                            multiple
-                            className="mt-5 block w-full text-sm text-[#172033]/60 file:mr-4 file:border-0 file:bg-[#1B2D5B] file:px-4 file:py-2.5 file:text-xs file:font-semibold file:text-white hover:file:bg-[#172033]"
-                          />
-                        </label>
-
-                        <p className="text-xs leading-5 text-[#172033]/45">
-                          Document upload is currently part of the application
-                          experience only. Secure storage and processing will
-                          be connected before launch.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="my-14 border-t border-[#172033]/10" />
-
-                    {/* About your interest */}
-                    <div>
-                      <div className="flex items-start gap-5">
-                        <SectionNumber number="04" />
-
-                        <div>
-                          <h3 className="text-2xl font-medium tracking-[-0.03em] text-[#172033]">
-                            Anything else?
-                          </h3>
-
-                          <p className="mt-2 text-sm leading-6 text-[#172033]/55">
-                            Give us a little more context if you’d like.
-                          </p>
+                        <div id="document-error">
+                          <FieldError errors={errors.document} />
                         </div>
-                      </div>
 
-                      <div className="mt-10">
-                        <FieldLabel>
-                          Tell us anything you think we should know
-                        </FieldLabel>
-
-                        <textarea
-                          name="additionalInformation"
-                          placeholder="Is there anything about your experience, interests, or professional background you would like to share?"
-                          className={textareaClassName}
-                        />
+                        <p className="mt-4 text-xs leading-5 text-[#172033]/45">
+                          Your document will be stored privately and used only
+                          as part of your application.
+                        </p>
                       </div>
                     </div>
 
@@ -505,7 +602,7 @@ export function JoinNetworkPage() {
                     {/* Consent */}
                     <div>
                       <div className="flex items-start gap-5">
-                        <SectionNumber number="05" />
+                        <SectionNumber number="04" />
 
                         <div>
                           <h3 className="text-2xl font-medium tracking-[-0.03em] text-[#172033]">
@@ -518,34 +615,100 @@ export function JoinNetworkPage() {
                         </div>
                       </div>
 
-                      <label className="mt-8 flex cursor-pointer gap-4">
-                        <input
-                          required
-                          type="checkbox"
-                          name="consent"
-                          className="mt-1 h-4 w-4 shrink-0 accent-[#1B2D5B]"
-                        />
+                      <div className="mt-8 space-y-6">
+                        <div>
+                          <label className="flex cursor-pointer gap-4">
+                            <input
+                              required
+                              type="checkbox"
+                              name="consent"
+                              className="mt-1 h-4 w-4 shrink-0 accent-[#1B2D5B]"
+                              aria-invalid={Boolean(errors.consent)}
+                              aria-describedby={
+                                errors.consent ? "consent-error" : undefined
+                              }
+                            />
 
-                        <span className="text-sm leading-6 text-[#172033]/65">
-                          I understand that the information I provide will be
-                          used to respond to my application and communicate
-                          with me about potential opportunities. I have read
-                          the{" "}
-                          <Link
-                            href="/privacy"
-                            className="font-medium text-[#1B2D5B] underline underline-offset-4"
-                          >
-                            Privacy Policy
-                          </Link>
-                          .
-                        </span>
-                      </label>
+                            <span className="text-sm leading-6 text-[#172033]/65">
+                              I understand that the information I provide will
+                              be used to respond to my application and
+                              communicate with me about potential opportunities.
+                            </span>
+                          </label>
+
+                          <div id="consent-error" className="ml-8">
+                            <FieldError errors={errors.consent} />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="flex cursor-pointer gap-4">
+                            <input
+                              required
+                              type="checkbox"
+                              name="privacyAcknowledged"
+                              className="mt-1 h-4 w-4 shrink-0 accent-[#1B2D5B]"
+                              aria-invalid={Boolean(
+                                errors.privacyAcknowledged,
+                              )}
+                              aria-describedby={
+                                errors.privacyAcknowledged
+                                  ? "privacyAcknowledged-error"
+                                  : undefined
+                              }
+                            />
+
+                            <span className="text-sm leading-6 text-[#172033]/65">
+                              I have read and acknowledge the{" "}
+                              <Link
+                                href="/privacy"
+                                className="font-medium text-[#1B2D5B] underline underline-offset-4"
+                              >
+                                Privacy Policy
+                              </Link>
+                              .
+                            </span>
+                          </label>
+
+                          <div id="privacyAcknowledged-error" className="ml-8">
+                            <FieldError
+                              errors={errors.privacyAcknowledged}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {state.message && !state.success && state.errors && (
+                        <div
+                          role="alert"
+                          className="mt-8 border border-red-700/20 bg-red-50 px-5 py-4 text-sm leading-6 text-red-800"
+                        >
+                          {state.message}
+                        </div>
+                      )}
 
                       <div className="mt-9">
-                        <Button type="submit" size="lg" arrow>
-                          Submit my introduction
+                        <Button
+                          type="submit"
+                          size="lg"
+                          arrow={!isPending}
+                          disabled={isPending}
+                        >
+                          {isPending
+                            ? "Submitting application..."
+                            : "Submit my introduction"}
                         </Button>
                       </div>
+
+                      {isPending && (
+                        <p
+                          className="mt-4 text-xs leading-5 text-[#172033]/45"
+                          aria-live="polite"
+                        >
+                          Please wait while we securely submit your
+                          introduction.
+                        </p>
+                      )}
                     </div>
                   </form>
                 </div>
@@ -572,9 +735,7 @@ export function JoinNetworkPage() {
                 </h2>
 
                 <p className="mx-auto mt-7 max-w-[570px] text-base leading-7 text-[#172033]/60 sm:text-lg sm:leading-8">
-                  We’ve received your information. Your introduction gives us
-                  a better understanding of your experience and where you may
-                  be able to contribute.
+                  {state.message}
                 </p>
 
                 <p className="mx-auto mt-4 max-w-[520px] text-sm leading-6 text-[#172033]/50">
@@ -583,7 +744,10 @@ export function JoinNetworkPage() {
                 </p>
 
                 <div className="mt-10 flex flex-wrap justify-center gap-4">
-                  <Button href="/for-healthcare-professionals" variant="secondary">
+                  <Button
+                    href="/for-healthcare-professionals"
+                    variant="secondary"
+                  >
                     Back to professionals
                   </Button>
 

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { useState } from "react";
+import { useActionState } from "react";
 
+import { submitRequestStaffing } from "@/app/actions/request-staffing";
+import type { RequestStaffingState } from "@/app/actions/request-staffing";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Arrow } from "@/components/ui/arrow";
@@ -20,19 +22,19 @@ const softViewport = {
   amount: 0.3,
 };
 
+const initialState: RequestStaffingState = {
+  success: false,
+  message: "",
+};
+
 export function RequestStaffingPage() {
   const prefersReducedMotion = useReducedMotion();
   const reducedMotion = prefersReducedMotion ?? false;
 
-  const [submitted, setSubmitted] = useState(false);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    // Temporary MVP state.
-    // This will be replaced with a Server Action when the backend is built.
-    setSubmitted(true);
-  }
+  const [state, formAction, isPending] = useActionState(
+    submitRequestStaffing,
+    initialState,
+  );
 
   return (
     <div className="overflow-hidden">
@@ -230,44 +232,64 @@ export function RequestStaffingPage() {
               </div>
             </motion.aside>
 
-            {/* FORM */}
-            <motion.div
-              initial={{
-                opacity: 0,
-                y: reducedMotion ? 0 : 30,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              viewport={softViewport}
-              transition={{
-                duration: reducedMotion ? 0.01 : 0.9,
-                delay: reducedMotion ? 0 : 0.08,
-                ease,
-              }}
-            >
-              {submitted ? (
+              {/* FORM */}
+              <motion.div
+                initial={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                whileInView={
+                  reducedMotion
+                    ? undefined
+                    : {
+                        opacity: 1,
+                        y: 0,
+                      }
+                }
+                viewport={softViewport}
+                transition={
+                  reducedMotion
+                    ? undefined
+                    : {
+                        duration: 0.9,
+                        delay: 0.08,
+                        ease,
+                      }
+                }
+              >
+              {state.success ? (
                 <SuccessState reducedMotion={reducedMotion} />
               ) : (
                 <form
-                  onSubmit={handleSubmit}
+                  action={formAction}
                   className="border-t border-[#172033]/10"
                 >
+                  {/* GENERAL SERVER ERROR */}
+                  {!state.success && state.message ? (
+                    <div
+                      role="alert"
+                      className="border-b border-red-900/10 bg-red-50 px-5 py-4 text-sm leading-6 text-red-900"
+                    >
+                      {state.message}
+                    </div>
+                  ) : null}
+
                   <FormSection number="01" title="About your organization">
                     <div className="grid gap-7 sm:grid-cols-2">
                       <Field
                         label="Organization name"
-                        name="organization"
+                        name="organizationName"
                         placeholder="Your organization"
                         required
+                        error={state.errors?.organizationName?.[0]}
                       />
 
                       <Field
                         label="Your name"
-                        name="name"
+                        name="contactName"
                         placeholder="Full name"
                         required
+                        error={state.errors?.contactName?.[0]}
                       />
 
                       <Field
@@ -276,6 +298,7 @@ export function RequestStaffingPage() {
                         type="email"
                         placeholder="you@organization.ca"
                         required
+                        error={state.errors?.email?.[0]}
                       />
 
                       <Field
@@ -283,6 +306,8 @@ export function RequestStaffingPage() {
                         name="phone"
                         type="tel"
                         placeholder="Your phone number"
+                        required
+                        error={state.errors?.phone?.[0]}
                       />
                     </div>
                   </FormSection>
@@ -291,8 +316,9 @@ export function RequestStaffingPage() {
                     <div className="grid gap-7 sm:grid-cols-2">
                       <SelectField
                         label="Staffing role"
-                        name="role"
+                        name="staffingRole"
                         required
+                        error={state.errors?.staffingRole?.[0]}
                         options={[
                           "Personal Support Worker",
                           "Registered Practical Nurse",
@@ -304,7 +330,9 @@ export function RequestStaffingPage() {
 
                       <SelectField
                         label="Type of support"
-                        name="supportType"
+                        name="staffingNeed"
+                        required
+                        error={state.errors?.staffingNeed?.[0]}
                         options={[
                           "Additional coverage",
                           "Ongoing staffing support",
@@ -318,39 +346,41 @@ export function RequestStaffingPage() {
                         name="location"
                         placeholder="City / community"
                         required
+                        error={state.errors?.location?.[0]}
                       />
 
                       <Field
                         label="Approximate number of staff needed"
-                        name="staffCount"
+                        name="approximateStaffCount"
                         type="number"
                         min="1"
                         placeholder="e.g. 2"
+                        error={state.errors?.approximateStaffCount?.[0]}
                       />
                     </div>
 
                     <div className="mt-7">
                       <TextAreaField
                         label="Tell us more"
-                        name="message"
+                        name="details"
                         placeholder="Tell us about the staffing need, role, timing, or anything else that would help us understand your situation."
-                        required
+                        error={state.errors?.details?.[0]}
                       />
                     </div>
                   </FormSection>
 
                   <FormSection number="03" title="Anything else?">
-                    <TextAreaField
-                      label="Additional information"
-                      name="additionalInformation"
-                      placeholder="Optional details you would like us to know."
-                    />
+                    <p className="max-w-[560px] text-sm leading-7 text-[#172033]/50">
+                      You can submit the request with the information above.
+                      We can clarify any additional details when we follow up.
+                    </p>
 
                     <label className="mt-8 flex cursor-pointer items-start gap-3">
                       <input
                         type="checkbox"
                         name="consent"
                         required
+                        aria-invalid={Boolean(state.errors?.consent)}
                         className="
                           mt-1
                           h-4
@@ -366,17 +396,36 @@ export function RequestStaffingPage() {
                         conversation about my organization&apos;s needs.
                       </span>
                     </label>
+
+                    {state.errors?.consent?.[0] ? (
+                      <p
+                        role="alert"
+                        className="mt-3 text-xs leading-5 text-red-700"
+                      >
+                        {state.errors.consent[0]}
+                      </p>
+                    ) : null}
                   </FormSection>
 
                   <div className="flex flex-col gap-5 border-t border-[#172033]/10 py-10 sm:flex-row sm:items-center sm:justify-between">
                     <p className="max-w-[360px] text-xs leading-[1.7] text-[#172033]/35">
                       By submitting this form, you are providing information
-                      for the purpose of responding to your request. See our
-                      privacy policy for more information.
+                      for the purpose of responding to your request. See our{" "}
+                      <a
+                        href="/privacy"
+                        className="text-[#172033]/55 underline underline-offset-4 transition-colors hover:text-[var(--navy)]"
+                      >
+                        privacy policy
+                      </a>{" "}
+                      for more information.
                     </p>
 
-                    <Button type="submit" size="lg">
-                      Send request
+                    <Button
+                      type="submit"
+                      size="lg"
+                      disabled={isPending}
+                    >
+                      {isPending ? "Sending request..." : "Send request"}
                     </Button>
                   </div>
                 </form>
@@ -525,6 +574,7 @@ type FieldProps = {
   type?: string;
   required?: boolean;
   min?: string;
+  error?: string;
 };
 
 function Field({
@@ -534,11 +584,13 @@ function Field({
   type = "text",
   required = false,
   min,
+  error,
 }: FieldProps) {
   return (
     <label className="group block">
       <span className="mb-3 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#172033]/45">
         {label}
+
         {required ? (
           <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
             *
@@ -552,11 +604,12 @@ function Field({
         placeholder={placeholder}
         required={required}
         min={min}
-        className="
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${name}-error` : undefined}
+        className={`
           h-14
           w-full
           border-b
-          border-[#172033]/15
           bg-transparent
           px-0
           text-[0.98rem]
@@ -565,9 +618,23 @@ function Field({
           placeholder:text-[#172033]/25
           transition-colors
           duration-300
-          focus:border-[var(--navy)]
-        "
+          ${
+            error
+              ? "border-red-500 focus:border-red-600"
+              : "border-[#172033]/15 focus:border-[var(--navy)]"
+          }
+        `}
       />
+
+      {error ? (
+        <p
+          id={`${name}-error`}
+          role="alert"
+          className="mt-2 text-xs leading-5 text-red-700"
+        >
+          {error}
+        </p>
+      ) : null}
     </label>
   );
 }
@@ -577,6 +644,7 @@ type SelectFieldProps = {
   name: string;
   options: string[];
   required?: boolean;
+  error?: string;
 };
 
 function SelectField({
@@ -584,11 +652,13 @@ function SelectField({
   name,
   options,
   required = false,
+  error,
 }: SelectFieldProps) {
   return (
     <label className="group block">
       <span className="mb-3 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#172033]/45">
         {label}
+
         {required ? (
           <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
             *
@@ -601,12 +671,13 @@ function SelectField({
           name={name}
           required={required}
           defaultValue=""
-          className="
+          aria-invalid={Boolean(error)}
+          aria-describedby={error ? `${name}-error` : undefined}
+          className={`
             h-14
             w-full
             appearance-none
             border-b
-            border-[#172033]/15
             bg-transparent
             px-0
             pr-8
@@ -615,8 +686,12 @@ function SelectField({
             outline-none
             transition-colors
             duration-300
-            focus:border-[var(--navy)]
-          "
+            ${
+              error
+                ? "border-red-500 focus:border-red-600"
+                : "border-[#172033]/15 focus:border-[var(--navy)]"
+            }
+          `}
         >
           <option value="" disabled>
             Select an option
@@ -636,6 +711,16 @@ function SelectField({
           <Arrow direction="down" size="sm" />
         </span>
       </div>
+
+      {error ? (
+        <p
+          id={`${name}-error`}
+          role="alert"
+          className="mt-2 text-xs leading-5 text-red-700"
+        >
+          {error}
+        </p>
+      ) : null}
     </label>
   );
 }
@@ -645,6 +730,7 @@ type TextAreaFieldProps = {
   name: string;
   placeholder?: string;
   required?: boolean;
+  error?: string;
 };
 
 function TextAreaField({
@@ -652,11 +738,13 @@ function TextAreaField({
   name,
   placeholder,
   required = false,
+  error,
 }: TextAreaFieldProps) {
   return (
     <label className="group block">
       <span className="mb-3 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-[#172033]/45">
         {label}
+
         {required ? (
           <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
             *
@@ -669,11 +757,12 @@ function TextAreaField({
         placeholder={placeholder}
         required={required}
         rows={5}
-        className="
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${name}-error` : undefined}
+        className={`
           w-full
           resize-y
           border-b
-          border-[#172033]/15
           bg-transparent
           px-0
           py-3
@@ -684,9 +773,23 @@ function TextAreaField({
           placeholder:text-[#172033]/25
           transition-colors
           duration-300
-          focus:border-[var(--navy)]
-        "
+          ${
+            error
+              ? "border-red-500 focus:border-red-600"
+              : "border-[#172033]/15 focus:border-[var(--navy)]"
+          }
+        `}
       />
+
+      {error ? (
+        <p
+          id={`${name}-error`}
+          role="alert"
+          className="mt-2 text-xs leading-5 text-red-700"
+        >
+          {error}
+        </p>
+      ) : null}
     </label>
   );
 }
@@ -772,3 +875,4 @@ function SuccessState({
     </motion.div>
   );
 }
+
