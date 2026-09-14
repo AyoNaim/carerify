@@ -9,6 +9,8 @@ import {
 
 const DOCUMENT_BUCKET = "professional-documents";
 
+export const runtime = "nodejs"
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const ALLOWED_FILE_TYPES = new Set([
@@ -82,7 +84,7 @@ export async function POST(request: Request) {
       phone: formData.get("phone"),
       location: formData.get("location"),
       professionalRole: formData.get("professionalRole"),
-      yearsExperience: formData.get("yearsExperience"),
+      experience_level: formData.get("yearsExperience"),
       experienceSummary: formData.get("experienceSummary"),
       preferredArea: formData.get("preferredArea"),
       consent: formData.get("consent"),
@@ -325,3 +327,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

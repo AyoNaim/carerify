@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { FormEvent, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
-import {
-  submitJoinNetwork,
-  type JoinNetworkState,
-} from "@/app/actions/join-network";
+import type { JoinNetworkState } from "@/app/actions/join-network";
 import { Arrow } from "@/components/ui/arrow";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -97,10 +94,8 @@ const initialState: JoinNetworkState = {
 export function JoinNetworkPage() {
   const shouldReduceMotion = useReducedMotion();
 
-  const [state, formAction, isPending] = useActionState(
-    submitJoinNetwork,
-    initialState,
-  );
+  const [state, setState] = useState<JoinNetworkState>(initialState);
+  const [isPending, setIsPending] = useState(false);
 
   const errors = state.errors ?? {};
 
@@ -115,6 +110,53 @@ export function JoinNetworkPage() {
       ease: [0.22, 1, 0.36, 1],
     },
   };
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setIsPending(true);
+    setState(initialState);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+
+      const response = await fetch("/api/join-network", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result: JoinNetworkState = await response.json();
+
+      if (!response.ok) {
+        setState({
+          success: false,
+          message:
+            result.message ||
+            "We couldn't submit your introduction right now. Please try again.",
+          errors: result.errors,
+        });
+
+        return;
+      }
+
+      setState({
+        success: true,
+        message:
+          result.message ||
+          "We've received your introduction. Thank you for reaching out.",
+      });
+    } catch (error) {
+      console.error("Failed to submit healthcare professional application:", error);
+
+      setState({
+        success: false,
+        message:
+          "We couldn't submit your introduction right now. Please try again.",
+      });
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   return (
     <>
@@ -278,7 +320,8 @@ export function JoinNetworkPage() {
 
                   {/* Form */}
                   <form
-                    action={formAction}
+                    onSubmit={handleSubmit}
+                    encType="multipart/form-data"
                     className="bg-[#F5EFE6] px-6 py-8 sm:px-10 sm:py-12 lg:px-14 lg:py-16"
                   >
                     {/* General submission error */}

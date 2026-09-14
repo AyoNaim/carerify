@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
     const { data: inquiry, error: insertError } =
       await supabaseAdmin
-        .from("contact_inquiries")
+        .from("contact_messages")
         .insert({
           name: data.name,
           email: data.email,
@@ -186,4 +186,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

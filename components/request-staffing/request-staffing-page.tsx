@@ -1,10 +1,8 @@
 "use client";
 
+import { FormEvent, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useActionState } from "react";
 
-import { submitRequestStaffing } from "@/app/actions/request-staffing";
-import type { RequestStaffingState } from "@/app/actions/request-staffing";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Arrow } from "@/components/ui/arrow";
@@ -22,6 +20,12 @@ const softViewport = {
   amount: 0.3,
 };
 
+type RequestStaffingState = {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string[]>;
+};
+
 const initialState: RequestStaffingState = {
   success: false,
   message: "",
@@ -31,10 +35,59 @@ export function RequestStaffingPage() {
   const prefersReducedMotion = useReducedMotion();
   const reducedMotion = prefersReducedMotion ?? false;
 
-  const [state, formAction, isPending] = useActionState(
-    submitRequestStaffing,
-    initialState,
-  );
+  const [state, setState] = useState<RequestStaffingState>(initialState);
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setIsPending(true);
+
+    setState(initialState);
+
+    try {
+      const formData = new FormData(event.currentTarget);
+
+      const data = Object.fromEntries(formData.entries());
+
+      const response = await fetch("/api/request-staffing", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setState({
+          success: false,
+          message:
+            result.message ||
+            "We couldn't submit your request right now. Please try again.",
+          errors: result.errors,
+        });
+
+        return;
+      }
+
+      setState({
+        success: true,
+        message: result.message || "We've received your staffing request.",
+      });
+    } catch (error) {
+      console.error("Failed to submit staffing request:", error);
+
+      setState({
+        success: false,
+        message:
+          "We couldn't submit your request right now. Please try again.",
+      });
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   return (
     <div className="overflow-hidden">
@@ -232,36 +285,36 @@ export function RequestStaffingPage() {
               </div>
             </motion.aside>
 
-              {/* FORM */}
-              <motion.div
-                initial={{
-                  opacity: 1,
-                  y: 0,
-                }}
-                whileInView={
-                  reducedMotion
-                    ? undefined
-                    : {
-                        opacity: 1,
-                        y: 0,
-                      }
-                }
-                viewport={softViewport}
-                transition={
-                  reducedMotion
-                    ? undefined
-                    : {
-                        duration: 0.9,
-                        delay: 0.08,
-                        ease,
-                      }
-                }
-              >
+            {/* FORM */}
+            <motion.div
+              initial={{
+                opacity: 1,
+                y: 0,
+              }}
+              whileInView={
+                reducedMotion
+                  ? undefined
+                  : {
+                      opacity: 1,
+                      y: 0,
+                    }
+              }
+              viewport={softViewport}
+              transition={
+                reducedMotion
+                  ? undefined
+                  : {
+                      duration: 0.9,
+                      delay: 0.08,
+                      ease,
+                    }
+              }
+            >
               {state.success ? (
                 <SuccessState reducedMotion={reducedMotion} />
               ) : (
                 <form
-                  action={formAction}
+                  onSubmit={handleSubmit}
                   className="border-t border-[#172033]/10"
                 >
                   {/* GENERAL SERVER ERROR */}
@@ -592,7 +645,10 @@ function Field({
         {label}
 
         {required ? (
-          <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--sage)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}
@@ -660,7 +716,10 @@ function SelectField({
         {label}
 
         {required ? (
-          <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--sage)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}
@@ -746,7 +805,10 @@ function TextAreaField({
         {label}
 
         {required ? (
-          <span className="ml-1 text-[var(--sage)]" aria-hidden="true">
+          <span
+            className="ml-1 text-[var(--sage)]"
+            aria-hidden="true"
+          >
             *
           </span>
         ) : null}
