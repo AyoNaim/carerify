@@ -178,7 +178,7 @@ export default async function ContactMessageDetailPage({
             )}`}
             className="group flex w-full items-center justify-between rounded-2xl bg-[#1B2D5B] px-5 py-4 text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#152449] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2D5B] focus-visible:ring-offset-2"
           >
-            <span className="font-sans text-sm font-semibold">
+            <span className="font-sans text-sm text-white font-semibold">
               Reply via email
             </span>
 
