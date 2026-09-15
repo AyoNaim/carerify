@@ -51,6 +51,10 @@ const selectClassName =
 const textareaClassName =
   "mt-2 min-h-[130px] w-full resize-y rounded-none border border-[#172033]/15 bg-white/50 px-4 py-3 text-[15px] text-[#172033] outline-none transition-colors placeholder:text-[#172033]/40 focus:border-[#1B2D5B]";
 
+const smoothEase: [number, number, number, number] = [
+  0.22, 1, 0.36, 1,
+];
+
 function FieldLabel({
   children,
   required = false,
@@ -107,7 +111,7 @@ export function JoinNetworkPage() {
     viewport: { once: true, amount: 0.2 },
     transition: {
       duration: shouldReduceMotion ? 0 : 0.7,
-      ease: [0.22, 1, 0.36, 1],
+      ease: smoothEase,
     },
   };
 
@@ -146,7 +150,10 @@ export function JoinNetworkPage() {
           "We've received your introduction. Thank you for reaching out.",
       });
     } catch (error) {
-      console.error("Failed to submit healthcare professional application:", error);
+      console.error(
+        "Failed to submit healthcare professional application:",
+        error,
+      );
 
       setState({
         success: false,
@@ -169,10 +176,9 @@ export function JoinNetworkPage() {
             </motion.div>
 
             <div className="mt-7">
-              <TextReveal
-                text="Bring your work where it matters."
-                className="max-w-[760px] text-[clamp(3.2rem,7vw,7rem)] font-medium leading-[0.92] tracking-[-0.065em] text-[#172033]"
-              />
+              <TextReveal className="max-w-[760px] text-[clamp(3.2rem,7vw,7rem)] font-medium leading-[0.92] tracking-[-0.065em] text-[#172033]">
+                Bring your work where it matters.
+              </TextReveal>
             </div>
 
             <motion.p
@@ -198,11 +204,13 @@ export function JoinNetworkPage() {
           </div>
 
           <div className="relative">
-            <ImageReveal
-              src="/images/professional-network.jpg"
-              alt="Healthcare professional in a calm care environment"
-              className="aspect-[4/5] w-full max-w-[560px] lg:ml-auto"
-            />
+            <ImageReveal className="aspect-[4/5] w-full max-w-[560px] lg:ml-auto">
+              <img
+                src="/images/professional-network.jpg"
+                alt="Healthcare professional in a calm care environment"
+                className="h-full w-full object-cover"
+              />
+            </ImageReveal>
 
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
@@ -210,7 +218,7 @@ export function JoinNetworkPage() {
               transition={{
                 delay: shouldReduceMotion ? 0 : 0.45,
                 duration: shouldReduceMotion ? 0 : 0.7,
-                ease: [0.22, 1, 0.36, 1],
+                ease: smoothEase,
               }}
               className="absolute -bottom-5 -left-3 max-w-[250px] bg-[#1B2D5B] p-5 text-[#F5EFE6] sm:-left-8 sm:p-6"
             >
@@ -293,7 +301,9 @@ export function JoinNetworkPage() {
                 initial={shouldReduceMotion ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={shouldReduceMotion ? undefined : { opacity: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.45 }}
+                transition={{
+                  duration: shouldReduceMotion ? 0 : 0.45,
+                }}
               >
                 <div className="grid gap-12 lg:grid-cols-[0.5fr_1.5fr] lg:gap-20">
                   {/* Form intro */}
@@ -713,7 +723,10 @@ export function JoinNetworkPage() {
                             </span>
                           </label>
 
-                          <div id="privacyAcknowledged-error" className="ml-8">
+                          <div
+                            id="privacyAcknowledged-error"
+                            className="ml-8"
+                          >
                             <FieldError
                               errors={errors.privacyAcknowledged}
                             />
@@ -763,7 +776,7 @@ export function JoinNetworkPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
                   duration: shouldReduceMotion ? 0 : 0.65,
-                  ease: [0.22, 1, 0.36, 1],
+                  ease: smoothEase,
                 }}
                 className="mx-auto max-w-[760px] py-16 text-center lg:py-24"
               >
@@ -841,3 +854,4 @@ export function JoinNetworkPage() {
     </>
   );
 }
+
