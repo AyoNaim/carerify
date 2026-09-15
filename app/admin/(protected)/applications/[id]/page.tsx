@@ -22,7 +22,7 @@ type Application = {
   phone: string | null;
   location: string;
   professional_role: string;
-  experience_level: string;
+  years_experience: string;
   experience_summary: string | null;
   preferred_area: string | null;
   document_name: string | null;
@@ -206,7 +206,7 @@ export default async function ApplicationDetailPage({
 
               <DetailItem
                 label="Experience"
-                value={record.experience_level}
+                value={record.years_experience}
               />
 
               <DetailItem
