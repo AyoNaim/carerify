@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { ArrowUpRight } from "@/components/ui/arrow";
+import { Arrow } from "@/components/ui/arrow";
 
 export const dynamic = "force-dynamic";
 
@@ -183,7 +183,7 @@ export default async function ContactMessageDetailPage({
             </span>
 
             <span className="transition-transform duration-200 group-hover:translate-x-0.5">
-              <ArrowUpRight />
+              <Arrow direction="right" />
             </span>
           </a>
         </aside>
