@@ -6,7 +6,10 @@ import {
   type HTMLMotionProps,
   type Variants,
 } from "framer-motion";
-import type { ReactNode } from "react";
+import type {
+  ComponentPropsWithoutRef,
+  ReactNode,
+} from "react";
 
 import { Arrow } from "@/components/ui/arrow";
 
@@ -33,7 +36,7 @@ type ButtonAsButton = BaseProps &
   };
 
 type ButtonAsLink = BaseProps &
-  Omit<HTMLMotionProps<"a">, "children"> & {
+  Omit<ComponentPropsWithoutRef<"a">, "children" | "href"> & {
     href: string;
   };
 
@@ -88,6 +91,14 @@ export function Button({
 }: ButtonProps) {
   const classes = getVariantClasses(variant);
 
+  /*
+   * The Button component owns its text color.
+   *
+   * This prevents a dark background from accidentally inheriting a
+   * dark text color from a parent or from arbitrary utility classes.
+   */
+  const textColorClass = classes.textColor;
+
   const content = (
     <>
       {/* ---------------------------------------------------------------- */}
@@ -110,7 +121,9 @@ export function Button({
       {/* Content                                                          */}
       {/* ---------------------------------------------------------------- */}
 
-      <span className="relative z-10 flex items-center gap-3">
+      <span
+        className={`relative z-10 flex items-center gap-3 ${textColorClass}`}
+      >
         <span className="relative overflow-hidden">
           <motion.span
             className="block"
@@ -172,8 +185,20 @@ export function Button({
     ${className}
   `;
 
-  if ("href" in props && props.href) {
-    const { href, ...linkProps } = props;
+  /*
+   * ----------------------------------------------------------------------
+   * Link variant
+   * ----------------------------------------------------------------------
+   *
+   * The link itself is a normal Next.js Link.
+   * Animation is handled by the surrounding motion.div.
+   */
+
+  if ("href" in props) {
+    const {
+      href,
+      ...linkProps
+    } = props as ButtonAsLink;
 
     return (
       <motion.div
@@ -199,6 +224,14 @@ export function Button({
     );
   }
 
+  /*
+   * ----------------------------------------------------------------------
+   * Button variant
+   * ----------------------------------------------------------------------
+   */
+
+  const buttonProps = props as ButtonAsButton;
+
   return (
     <motion.button
       initial="rest"
@@ -211,7 +244,7 @@ export function Button({
         ease: [0.22, 1, 0.36, 1] as const,
       }}
       className={sharedClassName}
-      {...props}
+      {...buttonProps}
     >
       {content}
     </motion.button>
@@ -222,27 +255,31 @@ function getVariantClasses(variant: ButtonVariant) {
   switch (variant) {
     case "primary":
       return {
-        base: "bg-[var(--navy)] text-white",
+        base: "bg-[var(--navy)]",
+        textColor: "text-white",
         hoverBackground: "bg-[var(--sage)]",
       };
 
     case "secondary":
       return {
         base:
-          "border border-[rgba(27,45,91,0.18)] bg-transparent text-[var(--navy)]",
+          "border border-[rgba(27,45,91,0.18)] bg-transparent",
+        textColor: "text-[var(--navy)]",
         hoverBackground: "bg-[var(--sage-light)]",
       };
 
     case "light":
       return {
-        base: "bg-white text-[var(--navy)]",
+        base: "bg-white",
+        textColor: "text-[var(--navy)]",
         hoverBackground: "bg-[var(--sage-light)]",
       };
 
     case "text":
       return {
         base:
-          "rounded-none! px-0! text-[var(--navy)]",
+          "rounded-none! px-0! bg-transparent!",
+        textColor: "text-[var(--navy)]",
         hoverBackground: "",
       };
   }

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
@@ -49,13 +48,9 @@ export function AdminShell({ children }: AdminShellProps) {
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-[260px] border-r border-[#1B2D5B]/10 bg-[#FBF8F3] lg:flex lg:flex-col">
         <div className="flex h-full flex-col px-6 py-7">
-          <Link
-            href="/admin"
-            aria-label="CareRify admin dashboard"
-            className="mb-14 block"
-          >
+          <div className="mb-14 block">
             <Logo />
-          </Link>
+          </div>
 
           <div className="mb-5 px-3">
             <p className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-[#1B2D5B]/45">
@@ -68,7 +63,7 @@ export function AdminShell({ children }: AdminShellProps) {
               const active = isActive(item.href);
 
               return (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
                   className="group relative flex items-center rounded-xl px-3 py-3 transition-colors duration-200 hover:bg-[#E8F0EA]"
@@ -98,7 +93,7 @@ export function AdminShell({ children }: AdminShellProps) {
                   >
                     {item.label}
                   </span>
-                </Link>
+                </a>
               );
             })}
           </nav>
@@ -121,18 +116,16 @@ export function AdminShell({ children }: AdminShellProps) {
       <header className="sticky top-0 z-50 border-b border-[#1B2D5B]/10 bg-[#FBF8F3]/95 backdrop-blur-md lg:hidden">
         <Container>
           <div className="flex h-[72px] items-center justify-between">
-            <Link
-              href="/admin"
-              aria-label="CareRify admin dashboard"
-              onClick={() => setMobileOpen(false)}
-            >
+            <div onClick={() => setMobileOpen(false)}>
               <Logo />
-            </Link>
+            </div>
 
             <button
               type="button"
               aria-label={
-                mobileOpen ? "Close admin navigation" : "Open admin navigation"
+                mobileOpen
+                  ? "Close admin navigation"
+                  : "Open admin navigation"
               }
               aria-expanded={mobileOpen}
               onClick={() => setMobileOpen((current) => !current)}
@@ -141,17 +134,23 @@ export function AdminShell({ children }: AdminShellProps) {
               <span className="relative flex h-4 w-5 flex-col justify-between">
                 <span
                   className={`h-px w-full bg-current transition-transform duration-200 ${
-                    mobileOpen ? "translate-y-[7px] rotate-45" : ""
+                    mobileOpen
+                      ? "translate-y-[7px] rotate-45"
+                      : ""
                   }`}
                 />
+
                 <span
                   className={`h-px w-full bg-current transition-opacity duration-200 ${
                     mobileOpen ? "opacity-0" : ""
                   }`}
                 />
+
                 <span
                   className={`h-px w-full bg-current transition-transform duration-200 ${
-                    mobileOpen ? "-translate-y-[7px] -rotate-45" : ""
+                    mobileOpen
+                      ? "-translate-y-[7px] -rotate-45"
+                      : ""
                   }`}
                 />
               </span>
@@ -163,17 +162,28 @@ export function AdminShell({ children }: AdminShellProps) {
       {/* Mobile navigation */}
       {mobileOpen && (
         <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
+          initial={
+            shouldReduceMotion
+              ? false
+              : { opacity: 0, y: -8 }
+          }
           animate={{ opacity: 1, y: 0 }}
-          exit={shouldReduceMotion ? undefined : { opacity: 0, y: -8 }}
+          exit={
+            shouldReduceMotion
+              ? undefined
+              : { opacity: 0, y: -8 }
+          }
           className="fixed inset-x-0 top-[72px] z-40 border-b border-[#1B2D5B]/10 bg-[#FBF8F3] px-6 py-5 shadow-[0_16px_40px_rgba(23,32,51,0.08)] lg:hidden"
         >
-          <nav aria-label="Mobile admin navigation" className="space-y-1">
+          <nav
+            aria-label="Mobile admin navigation"
+            className="space-y-1"
+          >
             {navigation.map((item) => {
               const active = isActive(item.href);
 
               return (
-                <Link
+                <a
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
@@ -184,7 +194,7 @@ export function AdminShell({ children }: AdminShellProps) {
                   }`}
                 >
                   {item.label}
-                </Link>
+                </a>
               );
             })}
           </nav>
@@ -194,12 +204,9 @@ export function AdminShell({ children }: AdminShellProps) {
       {/* Main application area */}
       <div className="min-h-screen lg:pl-[260px]">
         <main className="px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
-          <Container>
-            {children}
-          </Container>
+          <Container>{children}</Container>
         </main>
       </div>
     </div>
   );
 }
-

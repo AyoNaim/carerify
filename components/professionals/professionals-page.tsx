@@ -179,7 +179,7 @@ export function ProfessionalsPage() {
                   </p>
 
                   <div className="mt-8">
-                    <Button href="/contact" size="lg">
+                    <Button href="/join-our-healthcare-network" size="lg">
                       Join our healthcare network
                     </Button>
                   </div>
@@ -809,7 +809,7 @@ export function ProfessionalsPage() {
                 }}
                 className="mt-10"
               >
-                <Button href="/contact" variant="light" size="lg">
+                <Button href="/join-our-healthcare-network" variant="light" size="lg">
                   Join our healthcare network
                 </Button>
               </motion.div>

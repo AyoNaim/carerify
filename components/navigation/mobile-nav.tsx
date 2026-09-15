@@ -293,6 +293,66 @@ function MobileMenu({
         text-white
       "
     >
+      {/* ------------------------------------------------------------------ */}
+      {/* Close button                                                       */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div className="absolute right-5 top-6 z-[130] sm:right-8 sm:top-7">
+        <motion.button
+          type="button"
+          onClick={closeMenu}
+          aria-label="Close navigation"
+          whileTap={{ scale: 0.94 }}
+          className="
+            flex
+            h-11
+            w-11
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/[0.22]
+            bg-white/[0.06]
+            text-white
+            transition-colors
+            duration-500
+            hover:bg-white/[0.12]
+            focus:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-[var(--sage)]
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-[var(--navy)]
+          "
+        >
+          <span
+            className="relative flex h-4 w-[18px] items-center justify-center"
+            aria-hidden="true"
+          >
+            <span
+              className="
+                absolute
+                left-0
+                h-px
+                w-full
+                rotate-45
+                bg-white
+              "
+            />
+
+            <span
+              className="
+                absolute
+                left-0
+                h-px
+                w-full
+                -rotate-45
+                bg-white
+              "
+            />
+          </span>
+        </motion.button>
+      </div>
+
       {/* Ambient editorial layer */}
       <div
         aria-hidden="true"
@@ -615,4 +675,3 @@ function MobileNavLink({
     </motion.div>
   );
 }
-
