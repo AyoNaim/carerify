@@ -80,7 +80,7 @@ export default async function ApplicationDetailPage({
         phone,
         location,
         professional_role,
-        experience_level,
+        years_experience,
         experience_summary,
         preferred_area,
         document_name,

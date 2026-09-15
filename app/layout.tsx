@@ -19,8 +19,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "CareRify — Verified Care. Every Shift.",
-    template: "%s — CareRify",
+    default: "CareRify | Verified Care. Every Shift.",
+    template: "%s - CareRify",
   },
 
   description:

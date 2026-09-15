@@ -14,7 +14,7 @@ type Application = {
   phone: string | null;
   location: string;
   professional_role: string;
-  experience_level: string;
+  years_experience: string;
   experience_summary: string | null;
   preferred_area: string | null;
   document_name: string | null;
@@ -41,7 +41,7 @@ export default async function AdminApplicationsPage() {
         phone,
         location,
         professional_role,
-        experience_level,
+        years_experience,
         experience_summary,
         preferred_area,
         document_name,
@@ -146,7 +146,7 @@ export default async function AdminApplicationsPage() {
                   {records.map((application) => (
                     <tr
                       key={application.id}
-                      className="group transition-colors hover:bg-[#E8F0EA]/45"
+                      className="group cursor-pointer transition-colors hover:bg-[#E8F0EA]/45"
                     >
                       <td className="px-6 py-5">
                         <Link
@@ -171,7 +171,7 @@ export default async function AdminApplicationsPage() {
 
                       <td className="px-6 py-5">
                         <p className="font-sans text-sm text-[#172033]/70">
-                          {application.experience_level}
+                          {application.years_experience}
                         </p>
                       </td>
 
@@ -195,7 +195,10 @@ export default async function AdminApplicationsPage() {
                       </td>
 
                       <td className="px-6 py-5 text-right">
-                        <div className="flex items-center justify-end gap-3">
+                        <Link
+                          href={`/admin/applications/${application.id}`}
+                          className="group/link flex items-center justify-end gap-3"
+                        >
                           <time
                             dateTime={application.created_at}
                             className="font-sans text-xs text-[#172033]/40"
@@ -203,8 +206,8 @@ export default async function AdminApplicationsPage() {
                             {formatDate(application.created_at)}
                           </time>
 
-                          <ArrowUpRight className="h-4 w-4 text-[#172033]/25 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#1B2D5B]" />
-                        </div>
+                          <ArrowUpRight className="h-4 w-4 text-[#172033]/25 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 group-hover/link:text-[#1B2D5B]" />
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -251,7 +254,7 @@ export default async function AdminApplicationsPage() {
                       </p>
 
                       <p className="mt-1 font-sans text-sm text-[#172033]/70">
-                        {application.experience_level}
+                        {application.years_experience}
                       </p>
                     </div>
 

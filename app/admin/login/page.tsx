@@ -17,9 +17,9 @@ export default function AdminLoginPage() {
   const shouldReduceMotion = useReducedMotion();
 
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [password, setPassword] = useState("");
+
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -28,26 +28,21 @@ export default function AdminLoginPage() {
     setStatus("loading");
     setErrorMessage("");
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo: `${window.location.origin}/admin`,
-      },
+      password,
     });
 
     if (error) {
-      console.error("Admin magic link request failed:", error);
+      console.error("Admin login failed:", error);
 
       setStatus("error");
-      setErrorMessage(
-        "We couldn't send the sign-in link right now. Please try again.",
-      );
+      setErrorMessage("Invalid email or password. Please try again.");
 
       return;
     }
 
-    setStatus("success");
+    window.location.href = "/admin";
   }
 
   return (
@@ -93,105 +88,95 @@ export default function AdminLoginPage() {
                   </h1>
 
                   <p className="mt-4 font-sans text-sm leading-7 text-[#172033]/60">
-                    Sign in securely using a one-time magic link sent to your
-                    authorized admin email.
+                    Sign in with your authorized CareRify administration
+                    account.
                   </p>
                 </div>
 
-                {status === "success" ? (
-                  <div className="mt-8 rounded-2xl border border-[#8FB39B]/40 bg-[#E8F0EA] p-5">
-                    <div className="flex gap-3">
-                      <div
-                        aria-hidden="true"
-                        className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1B2D5B] text-xs text-white"
-                      >
-                        ✓
-                      </div>
-
-                      <div>
-                        <p className="font-sans text-sm font-semibold text-[#1B2D5B]">
-                          Check your email
-                        </p>
-
-                        <p className="mt-1 font-sans text-sm leading-6 text-[#172033]/60">
-                          If the email is authorized, a secure sign-in link has
-                          been sent. The link will take you directly to the
-                          administration dashboard.
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setStatus("idle");
-                        setEmail("");
-                      }}
-                      className="mt-5 font-sans text-xs font-semibold text-[#1B2D5B] underline decoration-[#1B2D5B]/25 underline-offset-4 transition-colors hover:decoration-[#1B2D5B] focus:outline-none focus-visible:rounded focus-visible:ring-2 focus-visible:ring-[#1B2D5B]"
+                <form onSubmit={handleSubmit} className="mt-8">
+                  <div>
+                    <label
+                      htmlFor="admin-email"
+                      className="font-sans text-sm font-semibold text-[#172033]"
                     >
-                      Use a different email
-                    </button>
+                      Admin email
+                    </label>
+
+                    <input
+                      id="admin-email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      inputMode="email"
+                      required
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      placeholder="you@company.com"
+                      disabled={status === "loading"}
+                      className="mt-2 h-12 w-full rounded-xl border border-[#1B2D5B]/15 bg-white px-4 font-sans text-sm text-[#172033] outline-none transition-all placeholder:text-[#172033]/30 hover:border-[#1B2D5B]/25 focus:border-[#1B2D5B]/40 focus:ring-2 focus:ring-[#1B2D5B]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    />
                   </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="mt-8">
-                    <div>
-                      <label
-                        htmlFor="admin-email"
-                        className="font-sans text-sm font-semibold text-[#172033]"
-                      >
-                        Admin email
-                      </label>
 
-                      <input
-                        id="admin-email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        inputMode="email"
-                        required
-                        value={email}
-                        onChange={(event) => setEmail(event.target.value)}
-                        placeholder="you@company.com"
-                        disabled={status === "loading"}
-                        className="mt-2 h-12 w-full rounded-xl border border-[#1B2D5B]/15 bg-white px-4 font-sans text-sm text-[#172033] outline-none transition-all placeholder:text-[#172033]/30 hover:border-[#1B2D5B]/25 focus:border-[#1B2D5B]/40 focus:ring-2 focus:ring-[#1B2D5B]/10 disabled:cursor-not-allowed disabled:opacity-60"
-                      />
-                    </div>
-
-                    {status === "error" && (
-                      <div
-                        role="alert"
-                        className="mt-4 rounded-xl border border-red-900/10 bg-red-50 px-4 py-3"
-                      >
-                        <p className="font-sans text-xs leading-5 text-red-900">
-                          {errorMessage}
-                        </p>
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={status === "loading" || !email.trim()}
-                      className="mt-5 flex h-12 w-full items-center justify-center rounded-xl bg-[#1B2D5B] px-5 font-sans text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#152449] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2D5B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                  <div className="mt-5">
+                    <label
+                      htmlFor="admin-password"
+                      className="font-sans text-sm font-semibold text-[#172033]"
                     >
-                      {status === "loading" ? (
-                        <span className="flex items-center gap-2">
-                          <span
-                            aria-hidden="true"
-                            className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
-                          />
-                          Sending link…
-                        </span>
-                      ) : (
-                        "Send secure sign-in link"
-                      )}
-                    </button>
-                  </form>
-                )}
+                      Password
+                    </label>
+
+                    <input
+                      id="admin-password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      placeholder="Enter your password"
+                      disabled={status === "loading"}
+                      className="mt-2 h-12 w-full rounded-xl border border-[#1B2D5B]/15 bg-white px-4 font-sans text-sm text-[#172033] outline-none transition-all placeholder:text-[#172033]/30 hover:border-[#1B2D5B]/25 focus:border-[#1B2D5B]/40 focus:ring-2 focus:ring-[#1B2D5B]/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                  </div>
+
+                  {status === "error" && (
+                    <div
+                      role="alert"
+                      className="mt-4 rounded-xl border border-red-900/10 bg-red-50 px-4 py-3"
+                    >
+                      <p className="font-sans text-xs leading-5 text-red-900">
+                        {errorMessage}
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={
+                      status === "loading" ||
+                      !email.trim() ||
+                      !password
+                    }
+                    className="mt-6 flex h-12 w-full items-center justify-center rounded-xl bg-[#1B2D5B] px-5 font-sans text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#152449] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2D5B] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+                  >
+                    {status === "loading" ? (
+                      <span className="flex items-center gap-2">
+                        <span
+                          aria-hidden="true"
+                          className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+                        />
+                        Signing in…
+                      </span>
+                    ) : (
+                      "Sign in"
+                    )}
+                  </button>
+                </form>
 
                 <div className="mt-8 border-t border-[#1B2D5B]/10 pt-6">
                   <p className="font-sans text-xs leading-5 text-[#172033]/40">
                     Administration access is restricted to authorized
-                    CareRify personnel. No password is required.
+                    CareRify personnel.
                   </p>
                 </div>
               </div>

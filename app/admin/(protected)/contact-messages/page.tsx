@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { ArrowUpRight } from "@/components/ui/arrow";
+import { Arrow } from "@/components/ui/arrow";
 
 export const dynamic = "force-dynamic";
 
@@ -189,7 +189,7 @@ export default async function ContactMessagesPage() {
                           aria-label={`View message from ${message.name}`}
                           className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#1B2D5B]/10 text-[#1B2D5B] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#1B2D5B]/20 hover:bg-[#E8F0EA] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B2D5B] focus-visible:ring-offset-2"
                         >
-                          <ArrowUpRight />
+                          <Arrow direction="right" size="sm" />
                         </Link>
                       </td>
                     </tr>
@@ -219,7 +219,7 @@ export default async function ContactMessagesPage() {
                   </div>
 
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#1B2D5B]/10 text-[#1B2D5B] transition-colors group-hover:bg-[#E8F0EA]">
-                    <ArrowUpRight />
+                    <Arrow direction="right" size="sm" />
                   </span>
                 </div>
 
