@@ -346,7 +346,7 @@ export function TermsPage() {
                     }
               }
             >
-              <Eyebrow number="08" label="Terms" />
+              <Eyebrow number="08">Terms</Eyebrow>
 
               <h1 className="mt-8 max-w-5xl font-display text-[clamp(3.75rem,8vw,8rem)] font-medium leading-[0.9] tracking-[-0.055em] text-[#172033]">
                 Clear terms.
@@ -443,7 +443,7 @@ export function TermsPage() {
               }
               className="lg:sticky lg:top-32 lg:self-start"
             >
-              <Eyebrow label="Terms of use" />
+              <Eyebrow>Terms of use</Eyebrow>
 
               <p className="mt-6 max-w-xs text-sm leading-6 text-[#172033]/55">
                 These terms apply to your use of the publicly
@@ -643,9 +643,8 @@ export function TermsPage() {
             className="max-w-3xl"
           >
             <Eyebrow
-              label="CareRify"
               className="text-white/50"
-            />
+            >CareRify</Eyebrow>
 
             <p className="mt-7 font-display text-[clamp(2.5rem,5vw,5rem)] font-medium leading-[0.95] tracking-[-0.045em]">
               Straightforward from
